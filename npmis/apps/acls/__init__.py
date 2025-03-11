@@ -1,0 +1,1 @@
+default_app_config = 'npmis.apps.acls.apps.AclsConfig'

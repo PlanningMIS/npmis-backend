@@ -1,0 +1,5802 @@
+openapi: 3.0.3
+info:
+  title: NPMIS INTERNAL APIs
+  version: 0.0.0
+  description: National Project Management Information System
+paths:
+  /npmis/api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Check the credentials and return the REST Token
+        if the credentials are valid and authenticated.
+        Calls Django Auth login method to register User ID
+        in Django session framework
+
+        Accept the following POST parameters: username, password
+        Return the REST Framework Token Object's key.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWT'
+          description: ''
+  /npmis/api/v1/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: |-
+        Calls Django logout method and delete the Token object
+        assigned to the current User object.
+
+        Accepts/Returns nothing.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /npmis/api/v1/auth/password/change/:
+    post:
+      operationId: auth_password_change_create
+      description: |-
+        Calls Django Auth SetPasswordForm save method.
+
+        Accepts the following POST parameters: new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /npmis/api/v1/auth/password/reset/:
+    post:
+      operationId: auth_password_reset_create
+      description: |-
+        Calls Django Auth PasswordResetForm save method.
+
+        Accepts the following POST parameters: email
+        Returns the success/fail message.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /npmis/api/v1/auth/password/reset/confirm/:
+    post:
+      operationId: auth_password_reset_confirm_create
+      description: |-
+        Password reset e-mail link is confirmed, therefore
+        this resets the user's password.
+
+        Accepts the following POST parameters: token, uid,
+            new_password1, new_password2
+        Returns the success/fail message.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestAuthDetail'
+          description: ''
+  /npmis/api/v1/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /npmis/api/v1/auth/token/verify/:
+    post:
+      operationId: auth_token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+  /npmis/api/v1/auth/user/:
+    get:
+      operationId: auth_user_retrieve
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+    put:
+      operationId: auth_user_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetails'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+    patch:
+      operationId: auth_user_partial_update
+      description: |-
+        Reads and updates UserModel fields
+        Accepts GET, PUT, PATCH methods.
+
+        Default accepted fields: username, first_name, last_name
+        Default display fields: pk, username, email, first_name, last_name
+        Read-only fields: pk, email
+
+        Returns UserModel fields.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetails'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+          description: ''
+  /npmis/api/v1/projects/conceptnote/:
+    get:
+      operationId: projects_conceptnote_list
+      description: |-
+        This view will list all projects with project_no set to None.
+        A project with project_no set to None is considered a concept note.
+        This view will return a list of such projects.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: project_name
+        schema:
+          type: string
+      - in: query
+        name: project_nature
+        schema:
+          type: integer
+      - in: query
+        name: sector
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - APPROVED
+          - DRAFT
+          - PENDING
+          - RECOMMENDED
+        description: |-
+          * `DRAFT` - DRAFT
+          * `PENDING` - PENDING
+          * `RECOMMENDED` - RECOMMENDED
+          * `APPROVED` - APPROVED
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConceptNoteListList'
+          description: ''
+  /npmis/api/v1/projects/conceptnote/create:
+    post:
+      operationId: projects_conceptnote_create_create
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConceptNoteCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConceptNoteCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConceptNoteCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConceptNoteCreate'
+          description: ''
+  /npmis/api/v1/projects/conceptnote/detail/{project_id}:
+    get:
+      operationId: projects_conceptnote_detail_retrieve
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: string
+        description: A unique value identifying this project.
+        required: true
+      tags:
+      - projects
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConceptNote'
+          description: ''
+  /npmis/api/v1/projects/conceptnote/update/{project_id}:
+    put:
+      operationId: projects_conceptnote_update_update
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: string
+        description: A unique value identifying this project.
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConceptNote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConceptNote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConceptNote'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConceptNote'
+          description: ''
+    patch:
+      operationId: projects_conceptnote_update_partial_update
+      parameters:
+      - in: path
+        name: project_id
+        schema:
+          type: string
+        description: A unique value identifying this project.
+        required: true
+      tags:
+      - projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedConceptNote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedConceptNote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedConceptNote'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConceptNote'
+          description: ''
+  /npmis/api/v1/settings/agenda/:
+    get:
+      operationId: settings_agenda_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAgendaListList'
+          description: ''
+  /npmis/api/v1/settings/agenda/aspiration/:
+    get:
+      operationId: settings_agenda_aspiration_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAgendaAspirationListList'
+          description: ''
+  /npmis/api/v1/settings/agenda/aspiration/create:
+    post:
+      operationId: settings_agenda_aspiration_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaAspirationCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaAspirationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaAspirationCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaAspirationCreate'
+          description: ''
+  /npmis/api/v1/settings/agenda/aspiration/detail/{agenda}/{aspiration_no}:
+    get:
+      operationId: settings_agenda_aspiration_detail_retrieve
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: integer
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaAspirationDetail'
+          description: ''
+  /npmis/api/v1/settings/agenda/aspiration/update/{agenda}/{aspiration_no}:
+    put:
+      operationId: settings_agenda_aspiration_update_update
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaAspirationUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaAspirationUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaAspirationUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaAspirationUpdate'
+          description: ''
+    patch:
+      operationId: settings_agenda_aspiration_update_partial_update
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaAspirationUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaAspirationUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaAspirationUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaAspirationUpdate'
+          description: ''
+  /npmis/api/v1/settings/agenda/create:
+    post:
+      operationId: settings_agenda_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaCreate'
+          description: ''
+  /npmis/api/v1/settings/agenda/detail/{id}:
+    get:
+      operationId: settings_agenda_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaDetail'
+          description: ''
+  /npmis/api/v1/settings/agenda/goal/:
+    get:
+      operationId: settings_agenda_goal_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAgendaGoalListList'
+          description: ''
+  /npmis/api/v1/settings/agenda/goal/create:
+    post:
+      operationId: settings_agenda_goal_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaGoalCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaGoalCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaGoalCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaGoalCreate'
+          description: ''
+  /npmis/api/v1/settings/agenda/goal/detail/{agenda}/{aspiration_no}/{goal_no}:
+    get:
+      operationId: settings_agenda_goal_detail_retrieve
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaGoalDetail'
+          description: ''
+  /npmis/api/v1/settings/agenda/goal/update/{agenda}/{aspiration_no}/{goal_no}:
+    put:
+      operationId: settings_agenda_goal_update_update
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaGoalUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaGoalUpdate'
+          description: ''
+    patch:
+      operationId: settings_agenda_goal_update_partial_update
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaGoalUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaGoalUpdate'
+          description: ''
+  /npmis/api/v1/settings/agenda/target/:
+    get:
+      operationId: settings_agenda_target_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAgendaTargetListList'
+          description: ''
+  /npmis/api/v1/settings/agenda/target/create:
+    post:
+      operationId: settings_agenda_target_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaTarget'
+          description: ''
+  /npmis/api/v1/settings/agenda/target/detail/{agenda}/{aspiration_no}/{goal_no}/{target_no}:
+    get:
+      operationId: settings_agenda_target_detail_retrieve
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaTarget'
+          description: ''
+  /npmis/api/v1/settings/agenda/target/update/{agenda}/{aspiration_no}/{goal_no}/{target_no}:
+    put:
+      operationId: settings_agenda_target_update_update
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaTarget'
+          description: ''
+    patch:
+      operationId: settings_agenda_target_update_partial_update
+      parameters:
+      - in: path
+        name: agenda
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: aspiration_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaTarget'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaTarget'
+          description: ''
+  /npmis/api/v1/settings/agenda/update/{id}:
+    put:
+      operationId: settings_agenda_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgendaUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgendaUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgendaUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaUpdate'
+          description: ''
+    patch:
+      operationId: settings_agenda_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAgendaUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgendaUpdate'
+          description: ''
+  /npmis/api/v1/settings/costcentre/:
+    get:
+      operationId: settings_costcentre_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCostcentreListList'
+          description: ''
+  /npmis/api/v1/settings/costcentre/create:
+    post:
+      operationId: settings_costcentre_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CostcentreCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CostcentreCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CostcentreCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostcentreCreate'
+          description: ''
+  /npmis/api/v1/settings/costcentre/detail/{vote_no}/{costcentre_no}:
+    get:
+      operationId: settings_costcentre_detail_retrieve
+      parameters:
+      - in: path
+        name: costcentre_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: vote_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostcentreDetail'
+          description: ''
+  /npmis/api/v1/settings/costcentre/update/{vote_no}/{costcentre_no}:
+    put:
+      operationId: settings_costcentre_update_update
+      parameters:
+      - in: path
+        name: costcentre_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: vote_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CostcentreUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CostcentreUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CostcentreUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostcentreUpdate'
+          description: ''
+    patch:
+      operationId: settings_costcentre_update_partial_update
+      parameters:
+      - in: path
+        name: costcentre_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: vote_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCostcentreUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCostcentreUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCostcentreUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostcentreUpdate'
+          description: ''
+  /npmis/api/v1/settings/fydp/:
+    get:
+      operationId: settings_fydp_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFYDPListList'
+          description: ''
+  /npmis/api/v1/settings/fydp/create:
+    post:
+      operationId: settings_fydp_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FYDPCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FYDPCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FYDPCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPCreate'
+          description: ''
+  /npmis/api/v1/settings/fydp/detail/{id}:
+    get:
+      operationId: settings_fydp_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPDetail'
+          description: ''
+  /npmis/api/v1/settings/fydp/goal/:
+    get:
+      operationId: settings_fydp_goal_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFYDPGoalListList'
+          description: ''
+  /npmis/api/v1/settings/fydp/goal/create:
+    post:
+      operationId: settings_fydp_goal_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FYDPGoalCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FYDPGoalCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FYDPGoalCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPGoalCreate'
+          description: ''
+  /npmis/api/v1/settings/fydp/goal/detail/{fydp}/{goal_no}:
+    get:
+      operationId: settings_fydp_goal_detail_retrieve
+      parameters:
+      - in: path
+        name: fydp
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: integer
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPGoalDetail'
+          description: ''
+  /npmis/api/v1/settings/fydp/goal/update/{fydp}/{goal_no}:
+    put:
+      operationId: settings_fydp_goal_update_update
+      parameters:
+      - in: path
+        name: fydp
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FYDPGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FYDPGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FYDPGoalUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPGoalUpdate'
+          description: ''
+    patch:
+      operationId: settings_fydp_goal_update_partial_update
+      parameters:
+      - in: path
+        name: fydp
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPGoalUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPGoalUpdate'
+          description: ''
+  /npmis/api/v1/settings/fydp/target/:
+    get:
+      operationId: settings_fydp_target_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFYDPTargetListList'
+          description: ''
+  /npmis/api/v1/settings/fydp/target/create:
+    post:
+      operationId: settings_fydp_target_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FYDPTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FYDPTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FYDPTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPTarget'
+          description: ''
+  /npmis/api/v1/settings/fydp/target/detail/{fydp}/{goal_no}/{target_no}:
+    get:
+      operationId: settings_fydp_target_detail_retrieve
+      parameters:
+      - in: path
+        name: fydp
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPTarget'
+          description: ''
+  /npmis/api/v1/settings/fydp/target/update/{fydp}/{goal_no}/{target_no}:
+    put:
+      operationId: settings_fydp_target_update_update
+      parameters:
+      - in: path
+        name: fydp
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FYDPTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FYDPTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FYDPTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPTarget'
+          description: ''
+    patch:
+      operationId: settings_fydp_target_update_partial_update
+      parameters:
+      - in: path
+        name: fydp
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPTarget'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPTarget'
+          description: ''
+  /npmis/api/v1/settings/fydp/update/{id}:
+    put:
+      operationId: settings_fydp_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FYDPUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FYDPUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FYDPUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPUpdate'
+          description: ''
+    patch:
+      operationId: settings_fydp_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFYDPUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FYDPUpdate'
+          description: ''
+  /npmis/api/v1/settings/institution/:
+    get:
+      operationId: settings_institution_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInstitutionList'
+          description: ''
+  /npmis/api/v1/settings/institution/create:
+    post:
+      operationId: settings_institution_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Institution'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Institution'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Institution'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Institution'
+          description: ''
+  /npmis/api/v1/settings/institution/detail/{id}:
+    get:
+      operationId: settings_institution_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Institution'
+          description: ''
+  /npmis/api/v1/settings/institution/update/{id}:
+    put:
+      operationId: settings_institution_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Institution'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Institution'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Institution'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Institution'
+          description: ''
+    patch:
+      operationId: settings_institution_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedInstitution'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedInstitution'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedInstitution'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Institution'
+          description: ''
+  /npmis/api/v1/settings/programme/:
+    get:
+      operationId: settings_programme_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProgrammeListList'
+          description: ''
+  /npmis/api/v1/settings/programme/create:
+    post:
+      operationId: settings_programme_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgrammeCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProgrammeCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProgrammeCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgrammeCreate'
+          description: ''
+  /npmis/api/v1/settings/programme/detail/{id}:
+    get:
+      operationId: settings_programme_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgrammeDetail'
+          description: ''
+  /npmis/api/v1/settings/programme/update/{id}:
+    put:
+      operationId: settings_programme_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgrammeUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProgrammeUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProgrammeUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgrammeUpdate'
+          description: ''
+    patch:
+      operationId: settings_programme_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProgrammeUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProgrammeUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProgrammeUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgrammeUpdate'
+          description: ''
+  /npmis/api/v1/settings/projectnature/:
+    get:
+      operationId: settings_projectnature_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectNatureList'
+          description: ''
+  /npmis/api/v1/settings/projectnature/create:
+    post:
+      operationId: settings_projectnature_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectNature'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectNature'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectNature'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectNature'
+          description: ''
+  /npmis/api/v1/settings/projectnature/detail/{id}:
+    get:
+      operationId: settings_projectnature_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectNature'
+          description: ''
+  /npmis/api/v1/settings/projectnature/update/{id}:
+    put:
+      operationId: settings_projectnature_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectNature'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectNature'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectNature'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectNature'
+          description: ''
+    patch:
+      operationId: settings_projectnature_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectNature'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectNature'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProjectNature'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectNature'
+          description: ''
+  /npmis/api/v1/settings/sdg/:
+    get:
+      operationId: settings_sdg_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSDGListList'
+          description: ''
+  /npmis/api/v1/settings/sdg/create:
+    post:
+      operationId: settings_sdg_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SDGCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SDGCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SDGCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGCreate'
+          description: ''
+  /npmis/api/v1/settings/sdg/detail/{id}:
+    get:
+      operationId: settings_sdg_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGDetail'
+          description: ''
+  /npmis/api/v1/settings/sdg/goal/:
+    get:
+      operationId: settings_sdg_goal_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSDGGoalListList'
+          description: ''
+  /npmis/api/v1/settings/sdg/goal/create:
+    post:
+      operationId: settings_sdg_goal_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SDGGoalCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SDGGoalCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SDGGoalCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGGoalCreate'
+          description: ''
+  /npmis/api/v1/settings/sdg/goal/detail/{sdg}/{goal_no}:
+    get:
+      operationId: settings_sdg_goal_detail_retrieve
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGGoalDetail'
+          description: ''
+  /npmis/api/v1/settings/sdg/goal/update/{sdg}/{goal_no}:
+    put:
+      operationId: settings_sdg_goal_update_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SDGGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SDGGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SDGGoalUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGGoalUpdate'
+          description: ''
+    patch:
+      operationId: settings_sdg_goal_update_partial_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGGoalUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGGoalUpdate'
+          description: ''
+  /npmis/api/v1/settings/sdg/target/:
+    get:
+      operationId: settings_sdg_target_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSDGTargetListList'
+          description: ''
+  /npmis/api/v1/settings/sdg/target/create:
+    post:
+      operationId: settings_sdg_target_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SDGTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SDGTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SDGTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGTarget'
+          description: ''
+  /npmis/api/v1/settings/sdg/target/detail/{sdg}/{goal_no}/{target_no}:
+    get:
+      operationId: settings_sdg_target_detail_retrieve
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGTarget'
+          description: ''
+  /npmis/api/v1/settings/sdg/target/update/{sdg}/{goal_no}/{target_no}:
+    put:
+      operationId: settings_sdg_target_update_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SDGTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SDGTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SDGTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGTarget'
+          description: ''
+    patch:
+      operationId: settings_sdg_target_update_partial_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGTarget'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGTarget'
+          description: ''
+  /npmis/api/v1/settings/sdg/update/{id}:
+    put:
+      operationId: settings_sdg_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SDGUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SDGUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SDGUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGUpdate'
+          description: ''
+    patch:
+      operationId: settings_sdg_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSDGUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SDGUpdate'
+          description: ''
+  /npmis/api/v1/settings/sector/:
+    get:
+      operationId: settings_sector_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSectorListList'
+          description: ''
+  /npmis/api/v1/settings/sector/create:
+    post:
+      operationId: settings_sector_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sector'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Sector'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Sector'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sector'
+          description: ''
+  /npmis/api/v1/settings/sector/detail/{id}:
+    get:
+      operationId: settings_sector_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SectorDetail'
+          description: ''
+  /npmis/api/v1/settings/sector/update/{id}:
+    put:
+      operationId: settings_sector_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sector'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Sector'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Sector'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sector'
+          description: ''
+    patch:
+      operationId: settings_sector_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSector'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSector'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSector'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sector'
+          description: ''
+  /npmis/api/v1/settings/subsector/:
+    get:
+      operationId: settings_subsector_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubsectorList'
+          description: ''
+  /npmis/api/v1/settings/subsector/create:
+    post:
+      operationId: settings_subsector_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubsectorCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubsectorCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubsectorCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubsectorCreate'
+          description: ''
+  /npmis/api/v1/settings/subsector/detail/{id}:
+    get:
+      operationId: settings_subsector_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subsector'
+          description: ''
+  /npmis/api/v1/settings/subsector/update/{id}:
+    put:
+      operationId: settings_subsector_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subsector'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Subsector'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Subsector'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subsector'
+          description: ''
+    patch:
+      operationId: settings_subsector_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSubsector'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSubsector'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSubsector'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subsector'
+          description: ''
+  /npmis/api/v1/settings/tdv/:
+    get:
+      operationId: settings_tdv_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTDVListList'
+          description: ''
+  /npmis/api/v1/settings/tdv/create:
+    post:
+      operationId: settings_tdv_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TDVCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TDVCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TDVCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVCreate'
+          description: ''
+  /npmis/api/v1/settings/tdv/detail/{id}:
+    get:
+      operationId: settings_tdv_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVDetail'
+          description: ''
+  /npmis/api/v1/settings/tdv/goal/:
+    get:
+      operationId: settings_tdv_goal_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTDVGoalListList'
+          description: ''
+  /npmis/api/v1/settings/tdv/goal/create:
+    post:
+      operationId: settings_tdv_goal_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TDVGoalCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TDVGoalCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TDVGoalCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVGoalCreate'
+          description: ''
+  /npmis/api/v1/settings/tdv/goal/detail/{sdg}/{goal_no}:
+    get:
+      operationId: settings_tdv_goal_detail_retrieve
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVGoalDetail'
+          description: ''
+  /npmis/api/v1/settings/tdv/goal/update/{sdg}/{goal_no}:
+    put:
+      operationId: settings_tdv_goal_update_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TDVGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TDVGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TDVGoalUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVGoalUpdate'
+          description: ''
+    patch:
+      operationId: settings_tdv_goal_update_partial_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVGoalUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVGoalUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVGoalUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVGoalUpdate'
+          description: ''
+  /npmis/api/v1/settings/tdv/target/:
+    get:
+      operationId: settings_tdv_target_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTDVTargetListList'
+          description: ''
+  /npmis/api/v1/settings/tdv/target/create:
+    post:
+      operationId: settings_tdv_target_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TDVTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TDVTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TDVTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVTarget'
+          description: ''
+  /npmis/api/v1/settings/tdv/target/detail/{goal_no}/{target_no}:
+    get:
+      operationId: settings_tdv_target_detail_retrieve
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVTarget'
+          description: ''
+  /npmis/api/v1/settings/tdv/target/update/{sdg}/{goal_no}/{target_no}:
+    put:
+      operationId: settings_tdv_target_update_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TDVTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TDVTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TDVTarget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVTarget'
+          description: ''
+    patch:
+      operationId: settings_tdv_target_update_partial_update
+      parameters:
+      - in: path
+        name: goal_no
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: sdg
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: target_no
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVTarget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVTarget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVTarget'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVTarget'
+          description: ''
+  /npmis/api/v1/settings/tdv/update/{id}:
+    put:
+      operationId: settings_tdv_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TDVUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TDVUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TDVUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVUpdate'
+          description: ''
+    patch:
+      operationId: settings_tdv_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTDVUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TDVUpdate'
+          description: ''
+  /npmis/api/v1/settings/vote/:
+    get:
+      operationId: settings_vote_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVoteList'
+          description: ''
+  /npmis/api/v1/settings/vote/create:
+    post:
+      operationId: settings_vote_create_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vote'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+  /npmis/api/v1/settings/vote/detail/{id}:
+    get:
+      operationId: settings_vote_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+  /npmis/api/v1/settings/vote/update/{id}:
+    put:
+      operationId: settings_vote_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vote'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+    patch:
+      operationId: settings_vote_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVote'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+components:
+  schemas:
+    AgendaAspirationCreate:
+      type: object
+      properties:
+        agenda:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+      required:
+      - agenda
+      - description
+      - name
+    AgendaAspirationDetail:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        agenda:
+          type: integer
+        aspiration_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        targets:
+          type: string
+          readOnly: true
+      required:
+      - agenda
+      - aspiration_no
+      - code
+      - description
+      - name
+      - pk
+      - targets
+    AgendaAspirationList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        agenda:
+          type: integer
+        aspiration_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+      required:
+      - agenda
+      - aspiration_no
+      - code
+      - description
+      - name
+      - pk
+    AgendaAspirationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+      required:
+      - description
+      - name
+    AgendaCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 20
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - start_date
+    AgendaDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 20
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgendaGoalDetail'
+          readOnly: true
+      required:
+      - end_date
+      - goals
+      - id
+      - name
+      - start_date
+    AgendaGoalCreate:
+      type: object
+      properties:
+        agenda:
+          type: integer
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - agenda
+      - name
+    AgendaGoalDetail:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        agenda:
+          type: integer
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        targets:
+          type: string
+          readOnly: true
+      required:
+      - agenda
+      - code
+      - goal_no
+      - name
+      - pk
+      - targets
+    AgendaGoalList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        agenda:
+          type: integer
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - agenda
+      - code
+      - goal_no
+      - name
+      - pk
+    AgendaGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - name
+    AgendaList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 20
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - id
+      - name
+      - start_date
+    AgendaTarget:
+      type: object
+      properties:
+        agenda:
+          type: integer
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - agenda
+      - goal_no
+    AgendaTargetList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        agenda:
+          type: integer
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        target_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - agenda
+      - code
+      - goal_no
+      - pk
+      - target_no
+    AgendaUpdate:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+          maxLength: 20
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - pk
+      - start_date
+    CategoryEnum:
+      enum:
+      - Executive
+      - Legislature
+      - Judiciary
+      - MDA
+      - LGA
+      - Other
+      type: string
+      description: |-
+        * `Executive` - Executive
+        * `Legislature` - Legislature
+        * `Judiciary` - Judiciary
+        * `MDA` - MDA
+        * `LGA` - LGA
+        * `Other` - Other
+    ConceptNote:
+      type: object
+      properties:
+        project_id:
+          type: string
+          maxLength: 15
+        project_name:
+          type: string
+          maxLength: 255
+        programme:
+          type: string
+          nullable: true
+        project_nature:
+          type: integer
+          nullable: true
+        project_description:
+          type: string
+        project_background:
+          type: string
+        exp_start_date:
+          type: string
+          format: date
+        exp_completion_date:
+          type: string
+          format: date
+        sector:
+          type: string
+        subsector:
+          type: string
+        estimated_cost:
+          type: number
+          format: double
+        lifespan:
+          type: integer
+          maximum: 32767
+          minimum: -32768
+        project_objective:
+          type: string
+          maxLength: 1000
+        costcentre:
+          type: string
+          nullable: true
+          maxLength: 15
+        concept_note:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - estimated_cost
+      - exp_completion_date
+      - exp_start_date
+      - lifespan
+      - project_background
+      - project_description
+      - project_id
+      - project_name
+      - project_objective
+      - sector
+      - subsector
+    ConceptNoteCreate:
+      type: object
+      properties:
+        project_name:
+          type: string
+          maxLength: 255
+        programme:
+          type: string
+          nullable: true
+        project_nature:
+          type: integer
+          nullable: true
+        project_description:
+          type: string
+        project_background:
+          type: string
+        exp_start_date:
+          type: string
+          format: date
+        exp_completion_date:
+          type: string
+          format: date
+        sector:
+          type: string
+        subsector:
+          type: string
+        estimated_cost:
+          type: number
+          format: double
+        lifespan:
+          type: integer
+          maximum: 32767
+          minimum: -32768
+        project_objective:
+          type: string
+          maxLength: 1000
+        costcentre:
+          type: string
+          nullable: true
+          maxLength: 15
+        concept_note:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - estimated_cost
+      - exp_completion_date
+      - exp_start_date
+      - lifespan
+      - project_background
+      - project_description
+      - project_name
+      - project_objective
+      - sector
+      - subsector
+    ConceptNoteList:
+      type: object
+      properties:
+        project_id:
+          type: string
+          maxLength: 15
+        project_name:
+          type: string
+          maxLength: 255
+        project_nature:
+          type: integer
+          nullable: true
+        sector:
+          $ref: '#/components/schemas/Sector'
+        exp_start_date:
+          type: string
+          format: date
+        exp_completion_date:
+          type: string
+          format: date
+        estimated_cost:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+      required:
+      - estimated_cost
+      - exp_completion_date
+      - exp_start_date
+      - project_id
+      - project_name
+      - sector
+    CostcentreCreate:
+      type: object
+      properties:
+        costcentre_no:
+          type: string
+          maxLength: 15
+        vote_no:
+          type: string
+          maxLength: 4
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - costcentre_no
+      - name
+      - vote_no
+    CostcentreDetail:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        vote:
+          $ref: '#/components/schemas/Vote'
+        costcentre_no:
+          type: string
+          maxLength: 15
+        vote_no:
+          type: string
+          maxLength: 4
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - costcentre_no
+      - name
+      - pk
+      - vote
+      - vote_no
+    CostcentreList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        costcentre_no:
+          type: string
+          maxLength: 15
+        vote_no:
+          type: string
+          maxLength: 4
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - costcentre_no
+      - name
+      - pk
+      - vote_no
+    CostcentreUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        costcentre_no:
+          type: string
+          maxLength: 15
+        vote_no:
+          type: string
+          maxLength: 4
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - costcentre_no
+      - name
+      - pk
+      - vote_no
+    FYDPCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - start_date
+    FYDPDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/FYDPGoalDetail'
+          readOnly: true
+      required:
+      - end_date
+      - goals
+      - id
+      - name
+      - start_date
+    FYDPGoalCreate:
+      type: object
+      properties:
+        fydp:
+          type: string
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+      required:
+      - description
+      - fydp
+      - name
+    FYDPGoalDetail:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        fydp:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+        targets:
+          type: string
+          readOnly: true
+      required:
+      - code
+      - description
+      - fydp
+      - goal_no
+      - name
+      - pk
+      - targets
+    FYDPGoalList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        fydp:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+      required:
+      - code
+      - description
+      - fydp
+      - goal_no
+      - name
+      - pk
+    FYDPGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+      required:
+      - description
+      - name
+    FYDPList:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - id
+      - name
+      - start_date
+    FYDPTarget:
+      type: object
+      properties:
+        fydp:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          maxLength: 500
+      required:
+      - description
+      - fydp
+      - goal_no
+    FYDPTargetList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        fydp:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        target_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 500
+      required:
+      - code
+      - description
+      - fydp
+      - goal_no
+      - pk
+      - target_no
+    FYDPUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          title: Id
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - pk
+      - start_date
+    Institution:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 255
+        subsector:
+          $ref: '#/components/schemas/Subsector'
+      required:
+      - id
+      - name
+      - subsector
+    JWT:
+      type: object
+      description: Serializer for JWT authentication.
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserDetails'
+      required:
+      - access
+      - refresh
+      - user
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - password
+    PaginatedAgendaAspirationListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgendaAspirationList'
+    PaginatedAgendaGoalListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgendaGoalList'
+    PaginatedAgendaListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgendaList'
+    PaginatedAgendaTargetListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgendaTargetList'
+    PaginatedConceptNoteListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConceptNoteList'
+    PaginatedCostcentreListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CostcentreList'
+    PaginatedFYDPGoalListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FYDPGoalList'
+    PaginatedFYDPListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FYDPList'
+    PaginatedFYDPTargetListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FYDPTargetList'
+    PaginatedInstitutionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Institution'
+    PaginatedProgrammeListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgrammeList'
+    PaginatedProjectNatureList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectNature'
+    PaginatedSDGGoalListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SDGGoalList'
+    PaginatedSDGListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SDGList'
+    PaginatedSDGTargetListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SDGTargetList'
+    PaginatedSectorListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SectorList'
+    PaginatedSubsectorList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subsector'
+    PaginatedTDVGoalListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TDVGoalList'
+    PaginatedTDVListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TDVList'
+    PaginatedTDVTargetListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TDVTargetList'
+    PaginatedVoteList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vote'
+    PasswordChange:
+      type: object
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+      required:
+      - new_password1
+      - new_password2
+    PasswordReset:
+      type: object
+      description: Serializer for requesting a password reset e-mail.
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    PasswordResetConfirm:
+      type: object
+      description: Serializer for confirming a password reset attempt.
+      properties:
+        new_password1:
+          type: string
+          maxLength: 128
+        new_password2:
+          type: string
+          maxLength: 128
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - new_password1
+      - new_password2
+      - token
+      - uid
+    PatchedAgendaAspirationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+    PatchedAgendaGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+    PatchedAgendaTarget:
+      type: object
+      properties:
+        agenda:
+          type: integer
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+    PatchedAgendaUpdate:
+      type: object
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        name:
+          type: string
+          maxLength: 20
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    PatchedConceptNote:
+      type: object
+      properties:
+        project_id:
+          type: string
+          maxLength: 15
+        project_name:
+          type: string
+          maxLength: 255
+        programme:
+          type: string
+          nullable: true
+        project_nature:
+          type: integer
+          nullable: true
+        project_description:
+          type: string
+        project_background:
+          type: string
+        exp_start_date:
+          type: string
+          format: date
+        exp_completion_date:
+          type: string
+          format: date
+        sector:
+          type: string
+        subsector:
+          type: string
+        estimated_cost:
+          type: number
+          format: double
+        lifespan:
+          type: integer
+          maximum: 32767
+          minimum: -32768
+        project_objective:
+          type: string
+          maxLength: 1000
+        costcentre:
+          type: string
+          nullable: true
+          maxLength: 15
+        concept_note:
+          type: string
+          nullable: true
+          maxLength: 255
+    PatchedCostcentreUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        costcentre_no:
+          type: string
+          maxLength: 15
+        vote_no:
+          type: string
+          maxLength: 4
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+    PatchedFYDPGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+    PatchedFYDPTarget:
+      type: object
+      properties:
+        fydp:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          maxLength: 500
+    PatchedFYDPUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          title: Id
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    PatchedInstitution:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 255
+        subsector:
+          $ref: '#/components/schemas/Subsector'
+    PatchedProgrammeUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+    PatchedProjectNature:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+    PatchedSDGGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+    PatchedSDGTarget:
+      type: object
+      properties:
+        sdg:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+    PatchedSDGUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          title: Id
+          maxLength: 7
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    PatchedSector:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 255
+    PatchedSubsector:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 1000
+        sector:
+          $ref: '#/components/schemas/Sector'
+    PatchedTDVGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+    PatchedTDVTarget:
+      type: object
+      properties:
+        tdv:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          maxLength: 500
+    PatchedTDVUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          title: Id
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    PatchedUserDetails:
+      type: object
+      description: User model w/o password
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          readOnly: true
+          nullable: true
+          title: Email address
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+    PatchedVote:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        vote_no:
+          type: string
+          maxLength: 4
+        name:
+          type: string
+          maxLength: 255
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+    ProgrammeCreate:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 30
+        name:
+          type: string
+          maxLength: 255
+        sector:
+          type: string
+      required:
+      - id
+      - name
+      - sector
+    ProgrammeDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 30
+        name:
+          type: string
+          maxLength: 255
+        sector:
+          type: string
+      required:
+      - id
+      - name
+      - sector
+    ProgrammeList:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 30
+        name:
+          type: string
+          maxLength: 255
+        sector:
+          $ref: '#/components/schemas/Sector'
+      required:
+      - id
+      - name
+      - sector
+    ProgrammeUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - name
+    ProjectNature:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+      required:
+      - id
+      - name
+    RestAuthDetail:
+      type: object
+      properties:
+        detail:
+          type: string
+          readOnly: true
+      required:
+      - detail
+    SDGCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - start_date
+    SDGDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 7
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/SDGGoalDetail'
+          readOnly: true
+      required:
+      - end_date
+      - goals
+      - id
+      - name
+      - start_date
+    SDGGoalCreate:
+      type: object
+      properties:
+        sdg:
+          type: string
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - name
+      - sdg
+    SDGGoalDetail:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        sdg:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        targets:
+          type: string
+          readOnly: true
+      required:
+      - code
+      - goal_no
+      - name
+      - pk
+      - sdg
+      - targets
+    SDGGoalList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        sdg:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - code
+      - goal_no
+      - name
+      - pk
+      - sdg
+    SDGGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - name
+    SDGList:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 7
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - id
+      - name
+      - start_date
+    SDGTarget:
+      type: object
+      properties:
+        sdg:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - goal_no
+      - sdg
+    SDGTargetList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        sdg:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        target_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+      required:
+      - code
+      - goal_no
+      - pk
+      - sdg
+      - target_no
+    SDGUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          title: Id
+          maxLength: 7
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - pk
+      - start_date
+    Sector:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - name
+    SectorDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 255
+        subsectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubsectorList'
+          readOnly: true
+      required:
+      - id
+      - name
+      - subsectors
+    SectorList:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 255
+        subsectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubsectorList'
+          readOnly: true
+      required:
+      - id
+      - name
+      - subsectors
+    StatusEnum:
+      enum:
+      - DRAFT
+      - PENDING
+      - RECOMMENDED
+      - APPROVED
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `PENDING` - PENDING
+        * `RECOMMENDED` - RECOMMENDED
+        * `APPROVED` - APPROVED
+    Subsector:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 1000
+        sector:
+          $ref: '#/components/schemas/Sector'
+      required:
+      - id
+      - name
+      - sector
+    SubsectorCreate:
+      type: object
+      properties:
+        sector:
+          type: string
+        name:
+          type: string
+          maxLength: 1000
+      required:
+      - name
+      - sector
+    SubsectorList:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 1000
+      required:
+      - id
+      - name
+    TDVCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - start_date
+    TDVDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/TDVGoalDetail'
+          readOnly: true
+      required:
+      - end_date
+      - goals
+      - id
+      - name
+      - start_date
+    TDVGoalCreate:
+      type: object
+      properties:
+        tdv:
+          type: string
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+      required:
+      - description
+      - name
+      - tdv
+    TDVGoalDetail:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        tdv:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+        targets:
+          type: string
+          readOnly: true
+      required:
+      - code
+      - description
+      - goal_no
+      - name
+      - pk
+      - targets
+      - tdv
+    TDVGoalList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        tdv:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+      required:
+      - code
+      - description
+      - goal_no
+      - name
+      - pk
+      - tdv
+    TDVGoalUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 1000
+      required:
+      - description
+      - name
+    TDVList:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - id
+      - name
+      - start_date
+    TDVTarget:
+      type: object
+      properties:
+        tdv:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        description:
+          type: string
+          maxLength: 500
+      required:
+      - description
+      - goal_no
+      - tdv
+    TDVTargetList:
+      type: object
+      properties:
+        pk:
+          type: string
+          readOnly: true
+        tdv:
+          type: string
+        goal_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        target_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        code:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 500
+      required:
+      - code
+      - description
+      - goal_no
+      - pk
+      - target_no
+      - tdv
+    TDVUpdate:
+      type: object
+      properties:
+        pk:
+          type: string
+          title: Id
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+      required:
+      - end_date
+      - name
+      - pk
+      - start_date
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
+    UserDetails:
+      type: object
+      description: User model w/o password
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          readOnly: true
+          nullable: true
+          title: Email address
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - email
+      - pk
+      - username
+    Vote:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        vote_no:
+          type: string
+          maxLength: 4
+        name:
+          type: string
+          maxLength: 255
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+      required:
+      - id
+      - name
+      - vote_no
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
