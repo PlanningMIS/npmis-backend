@@ -928,7 +928,6 @@ class ProjectNatureDetailAPIView(RetrieveAPIView):
 class FundSourceListAPIView(ListAPIView):
     queryset = FundSource.objects.all()
     serializer_class = FundSourceSerializer
-    filterset_fields = ['fund_source', 'code']
 
 
 class FundSourceCreateAPIView(CreateAPIView):
@@ -997,7 +996,6 @@ class FinancingModalityListAPIView(ListAPIView):
     queryset = FinancingModality.objects.all()
     serializer_class = FinancingModalitySerializer
     filterset_fields = ['fund_category', 'code']
-
 
 
 class FinancingModalityCreateAPIView(CreateAPIView):
